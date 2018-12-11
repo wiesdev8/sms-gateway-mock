@@ -1,0 +1,77 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+
+group = 'local.example.ws.bluemedia'
+version = '0.0.1-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+// tag::jaxb[]
+configurations {
+    jaxb
+}
+
+// ---------------------------- XSD --------------------------------------
+task genJaxb {
+    ext.sourcesDir = "${buildDir}/generated-sources/jaxb"
+    ext.classesDir = "${buildDir}/classes/jaxb"
+    ext.schemaDir = "src/main/resources"
+    ext.schemaReceiver = 'sms-receiver-service.wsdl'
+    ext.bindingsReceiver = 'sms-receiver-bindings.xjb'
+
+    outputs.dir classesDir
+
+    doLast() {
+        project.ant {
+            taskdef name: "xjc", classname: "org.jvnet.jaxb2_commons.xjc.XJC2Task",
+                    classpath: configurations.jaxb.asPath
+            mkdir(dir: sourcesDir)
+            mkdir(dir: classesDir)
+
+            xjc(destdir: sourcesDir, binding: schemaDir + '/' + bindingsReceiver) {
+                schema(dir: schemaDir, includes: schemaReceiver)
+                arg(line:'-wsdl -Xequals -XhashCode')
+                produces(dir: sourcesDir, includes: "**/*.java")
+            }
+
+            javac(destdir: classesDir, source: 1.8, target: 1.8, debug: true,
+                    debugLevel: "lines,vars,source",
+                    classpath: configurations.jaxb.asPath) {
+                src(path: sourcesDir)
+                include(name: "**/*.java")
+                include(name: "*.java")
+            }
+
+            copy(todir: classesDir) {
+                fileset(dir: sourcesDir, erroronmissingdir: false) {
+                    exclude(name: "**/*.java")
+                }
+            }
+        }
+    }
+}
+// ---------------------------- XSD --------------------------------------
+
+
+dependencies {
+    jaxb group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.2.11'
+    jaxb group: 'org.jvnet.jaxb2_commons', name: 'jaxb2-basics-ant', version: '0.6.5'
+    jaxb group: 'org.jvnet.jaxb2_commons', name: 'jaxb2-basics', version: '0.6.4'
+    jaxb group: 'org.jvnet.jaxb2_commons', name: 'jaxb2-basics-annotate', version: '0.6.4'
+    compile files(genJaxb.classesDir).builtBy(genJaxb)
+    compile group: 'org.jvnet.jaxb2_commons', name: 'jaxb2-basics-runtime', version: '0.6.4'
+}
+
+jar {
+    from("${buildDir}/classes/jaxb")
+}

@@ -1,0 +1,19 @@
+server:
+  port: 8082
+
+example:
+  sms-api-mock:
+    messages-service-url: http://localhost:8081
+    submitted-number: 48000100200
+    authorized-users-smsapi-pl:
+      smsapimock: e66d54843c1ef5c6
+    authorized-users-blue-media:
+      bluemediamock: blue-media-password
+    recipients-correct-numbers-start-with: ''
+    messages-cache:
+      maximum-size: 100
+      expire-duration-after-write: 24
+      time-unit: HOURS
+    blue-media-receiver-client:
+      receiver-phone-number: 2345
+      operator: ''

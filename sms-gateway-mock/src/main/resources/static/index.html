@@ -1,0 +1,103 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>sms api - mock</title>
+    <link href="/webjars/bootstrap/3.3.7-1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/webjars/bootstrap/3.3.7-1/css/bootstrap-theme.min.css" rel="stylesheet">
+    <script type="text/javascript" src="/webjars/angularjs/1.7.4/angular.min.js"></script>
+</head>
+<body ng-app="myApp" ng-controller="HomeCtrl" style=" background-color: #ECEFF1; margin-left:60px;margin-top:30px">
+
+<div>
+
+    <div class="input-group">
+        <span class="input-group-addon">Phone number (with '+' prefix and digits): </span>
+        <input size="100%" type="text"
+               class="form-control"
+               ng-model="phoneNumber">
+    </div>
+    <div>
+        <button style="margin-top:10px" type="button" ng-click="readSentMessage()"
+                class="btn btn-lg btn-primary">Read message sent to '{{phoneNumber}}'
+        </button>
+
+    </div>
+    <br>
+    <textarea ng-show="textInSentMessage" class="form-control" rows="10" cols="30" readonly
+              placeholder="Text in sent message" ng-model="textInSentMessage" style="resize:none">
+
+    </textarea>
+    <textarea ng-show="errorWhenReadingSentMessage" class="form-control" rows="10" cols="30"
+              placeholder="Serwer output" ng-model="errorWhenReadingSentMessage" style="resize:none"></textarea>
+    <br>
+
+</div>
+<div>
+    <div class="input-group">
+        <span class="input-group-addon">Reply with text: </span>
+        <input size="100%" type="text"
+               class="form-control"
+               ng-model="replyWithText">
+    </div>
+    <div>
+        <button style="margin-top:10px" type="button" ng-click="sendReplyMessage()"
+                class="btn btn-lg btn-primary">Send reply message using phone number: '{{phoneNumber}}'
+        </button>
+    </div>
+    <br>
+
+    <div ng-show="replySentSuccessfully">
+        <textarea class="form-control" rows="10" cols="30" readonly
+                  ng-model="replySentSuccessfully" style="resize:none"></textarea>
+    </div>
+    <br>
+    <div ng-show="errorWhenSendingReplyMessage">
+        <textarea class="form-control" rows="10" cols="30" readonly
+                  ng-model="errorWhenSendingReplyMessage" style="resize:none"></textarea>
+    </div>
+
+</div>
+<div>
+</div>
+
+<script>
+    angular.module('myApp', []).controller('HomeCtrl', ['$scope', '$http',
+        function ($scope, $http) {
+            $scope.phoneNumber = '+48000900900';
+
+            var baseUrl = location.protocol + '//' + location.hostname + (location.port ? ':'+location.port: '');
+            var sentMessages = baseUrl + '/sent-messages/';
+            var smsReplies = baseUrl + '/sms-replies';
+
+            $scope.readSentMessage = function () {
+                $scope.errorWhenReadingSentMessage = null;
+                $scope.textInSentMessage = null;
+                $http.get(sentMessages + $scope.phoneNumber)
+                    .then(function (success) {
+                        $scope.textInSentMessage = success.data.text;
+                    }, function (error) {
+                        $scope.errorWhenReadingSentMessage = JSON.stringify(error, undefined, 4);
+                    });
+            };
+
+            $scope.sendReplyMessage = function () {
+                $scope.replySentSuccessfully = false;
+                $scope.errorWhenSendingReplyMessage = null;
+                $http({
+                    method: 'POST',
+                    url: smsReplies,
+                    data: {
+                        "from": $scope.phoneNumber,
+                        "text": $scope.replyWithText
+                    }
+                }).then(function (success) {
+                    $scope.replySentSuccessfully = 'Reply sent successfully!';
+                }, function (error) {
+                    $scope.errorWhenSendingReplyMessage = JSON.stringify(error, undefined, 4);
+                });
+            }
+        }
+    ]);
+</script>
+</body>
+</html>

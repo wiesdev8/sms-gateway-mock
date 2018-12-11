@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bindings version="2.1" xmlns="http://java.sun.com/xml/ns/jaxb"
+          xmlns:wsdl='http://schemas.xmlsoap.org/wsdl/'
+          xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <bindings schemaLocation="sms-receiver-service.wsdl"
+              node="//wsdl:definitions/wsdl:types/xs:schema">
+        <schemaBindings>
+            <package name="local.example.ws.bluemedia.sms.receiver"/>
+        </schemaBindings>
+    </bindings>
+</bindings>

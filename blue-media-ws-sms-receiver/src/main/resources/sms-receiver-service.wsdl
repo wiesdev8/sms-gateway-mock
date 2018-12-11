@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions name="ReceiverService" targetNamespace="http://com.bluemedia.fbs.webservice.receiver/webservice"
+             xmlns:tns="http://com.bluemedia.fbs.webservice.receiver/webservice"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+             xmlns="http://schemas.xmlsoap.org/wsdl/">
+    <types>
+        <xs:schema targetNamespace="http://com.bluemedia.fbs.webservice.receiver/webservice" version="1.0"
+                   xmlns:tns="http://com.bluemedia.fbs.webservice.receiver/webservice"
+                   xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:complexType name="sms">
+                <xs:sequence>
+                    <xs:element name="id" nillable="true" type="xs:long"/>
+                    <xs:element name="from" nillable="true" type="xs:string"/>
+                    <xs:element name="operator" nillable="true" type="xs:string"/>
+                    <xs:element name="to" nillable="true" type="xs:string"/>
+                    <xs:element name="text" nillable="true" type="xs:string"/>
+                    <xs:element name="numberOfParts" nillable="true" type="xs:int"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="mms">
+                <xs:sequence>
+                    <xs:element name="id" nillable="true" type="xs:long"/>
+                    <xs:element name="from" nillable="true" type="xs:string"/>
+                    <xs:element name="operator" nillable="true" type="xs:string"/>
+                    <xs:element name="to" nillable="true" type="xs:string"/>
+                    <xs:element name="text" nillable="true" type="xs:string"/>
+                    <xs:element name="numberOfParts" nillable="true" type="xs:int"/>
+                    <xs:element name="subject" nillable="true" type="xs:string"/>
+                    <xs:element maxOccurs="unbounded" name="attachments" nillable="true" type="tns:attachment"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="attachment">
+                <xs:sequence>
+                    <xs:element name="number" nillable="true" type="xs:int"/>
+                    <xs:element name="link" nillable="true" type="xs:string"/>
+                    <xs:element name="mimetype" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+    </types>
+    <message name="Receiver_ReceiveSmsResponse">
+        <part name="result" type="xsd:int"/>
+    </message>
+    <message name="Receiver_ReceiveMmsResponse">
+        <part name="result" type="xsd:int"/>
+    </message>
+    <message name="Receiver_ReceiveMms">
+        <part name="Mms_1" type="tns:mms"/>
+    </message>
+    <message name="Receiver_ReceiveSms">
+        <part name="Sms_1" type="tns:sms"/>
+    </message>
+    <portType name="Receiver">
+        <operation name="ReceiveMms" parameterOrder="Mms_1">
+            <input message="tns:Receiver_ReceiveMms"/>
+            <output message="tns:Receiver_ReceiveMmsResponse"/>
+        </operation>
+        <operation name="ReceiveSms" parameterOrder="Sms_1">
+            <input message="tns:Receiver_ReceiveSms"/>
+            <output message="tns:Receiver_ReceiveSmsResponse"/>
+        </operation>
+    </portType>
+    <binding name="ReceiverBinding" type="tns:Receiver">
+        <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="ReceiveMms">
+            <soap:operation soapAction=""/>
+            <input>
+                <soap:body use="literal" namespace="http://com.bluemedia.fbs.webservice.receiver/webservice"/>
+            </input>
+            <output>
+                <soap:body use="literal" namespace="http://com.bluemedia.fbs.webservice.receiver/webservice"/>
+            </output>
+        </operation>
+        <operation name="ReceiveSms">
+            <soap:operation soapAction=""/>
+            <input>
+                <soap:body use="literal" namespace="http://com.bluemedia.fbs.webservice.receiver/webservice"/>
+            </input>
+            <output>
+                <soap:body use="literal" namespace="http://com.bluemedia.fbs.webservice.receiver/webservice"/>
+            </output>
+        </operation>
+    </binding>
+    <service name="ReceiverService">
+        <port name="ReceiverPort" binding="tns:ReceiverBinding">
+            <soap:address location="http://.../'contextRoot'/'urlPattern'"/>
+        </port>
+    </service>
+</definitions>
